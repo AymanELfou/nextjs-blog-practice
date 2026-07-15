@@ -34,6 +34,16 @@ function WritePageContent() {
   const [tags, setTags] = useState<string[]>([]);
   const [isDark, setIsDark] = useState(false);
   const [activeTab, setActiveTab] = useState<"write" | "preview">("write");
+  const [imageUrl, setImageUrl] = useState("");
+  const [coverImage, setCoverImage] = useState("from-zinc-950 via-zinc-900 to-black");
+
+  const gradients = [
+    { name: "Slate", value: "from-zinc-950 via-zinc-900 to-black" },
+    { name: "Sunset", value: "from-amber-950 via-red-950 to-zinc-950" },
+    { name: "Ocean", value: "from-blue-950 via-indigo-950 to-zinc-950" },
+    { name: "Moss", value: "from-emerald-950 via-teal-950 to-zinc-950" },
+    { name: "Burgundy", value: "from-rose-950 via-purple-950 to-zinc-950" }
+  ];
 
   // Load post data if editing
   useEffect(() => {
@@ -46,6 +56,8 @@ function WritePageContent() {
         setCategory(existingPost.category);
         setReadTime(existingPost.readTime);
         setTags(existingPost.tags);
+        setImageUrl(existingPost.imageUrl || "");
+        setCoverImage(existingPost.coverImage || "from-zinc-950 via-zinc-900 to-black");
       } else {
         router.push("/write");
       }
@@ -96,6 +108,21 @@ function WritePageContent() {
     calculateReadTime(e.target.value);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image is too large! Please choose an image under 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handlePublish = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !excerpt.trim() || !content.trim()) return;
@@ -117,7 +144,8 @@ function WritePageContent() {
       readTime,
       tags,
       date: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-      coverImage: "from-zinc-950 via-zinc-900 to-black"
+      coverImage,
+      imageUrl
     };
 
     if (editSlug) {
@@ -233,6 +261,56 @@ function WritePageContent() {
               </div>
             </div>
 
+            {/* Background Gradient Selection */}
+            <div>
+              <label className="block text-[10px] font-mono uppercase tracking-widest text-foreground/50 mb-2 font-semibold">
+                Card Background Style
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {gradients.map((grad) => (
+                  <button
+                    key={grad.value}
+                    type="button"
+                    onClick={() => setCoverImage(grad.value)}
+                    className={`h-12 rounded-xl text-[10px] font-mono p-1 text-center transition-all ${
+                      coverImage === grad.value
+                        ? "ring-2 ring-foreground scale-[1.02] font-bold text-white"
+                        : "opacity-60 text-zinc-400 hover:opacity-100"
+                    } bg-gradient-to-br ${grad.value} cursor-pointer`}
+                  >
+                    {grad.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Cover Image Upload */}
+            <div>
+              <label className="block text-[10px] font-mono uppercase tracking-widest text-foreground/50 mb-2 font-semibold">
+                Cover Image Upload (Optional)
+              </label>
+              <div className="flex flex-col sm:flex-row gap-4 items-center border border-dashed border-foreground/20 rounded-xl p-4 bg-foreground/[0.01]">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="text-xs font-mono file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-mono file:bg-foreground file:text-background hover:file:opacity-90 cursor-pointer w-full sm:w-auto"
+                />
+                {imageUrl && (
+                  <div className="relative w-24 h-16 rounded-lg overflow-hidden border border-foreground/10 shrink-0">
+                    <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setImageUrl("")}
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full size-4 text-[9px] flex items-center justify-center hover:bg-red-700 cursor-pointer"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Excerpt */}
             <div>
               <label className="block text-[10px] font-mono uppercase tracking-widest text-foreground/50 mb-2">Summary / Excerpt</label>
@@ -319,35 +397,42 @@ function WritePageContent() {
             <span>Live Archive Preview</span>
           </div>
 
-          <div className="flex-1 border border-foreground/10 rounded-2xl bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-black overflow-y-auto p-8 max-h-[85vh]">
-            <div className="absolute top-2 right-2 size-2 bg-foreground/10 rounded-full animate-ping"></div>
+          <div className={`flex-1 border border-white/10 rounded-2xl bg-gradient-to-br ${coverImage} text-white overflow-y-auto p-8 max-h-[85vh] relative`}>
+            <div className="absolute top-2 right-2 size-2 bg-white/20 rounded-full animate-ping"></div>
             
             {/* Simulation of detailed view layout */}
             <div className="flex flex-col">
               
+              {/* Cover Image Banner (if uploaded) */}
+              {imageUrl && (
+                <div className="w-full h-40 rounded-xl overflow-hidden mb-6 border border-white/10 shadow-lg">
+                  <img src={imageUrl} alt="Cover Banner" className="w-full h-full object-cover" />
+                </div>
+              )}
+
               {/* Category & Read Time */}
               <div className="flex items-center gap-2 mb-4">
-                <span className="font-mono text-[9px] uppercase tracking-widest text-foreground/60 bg-foreground/5 border border-foreground/10 px-2 py-0.5 rounded">
+                <span className="font-mono text-[9px] uppercase tracking-widest text-white/80 bg-white/10 border border-white/20 px-2 py-0.5 rounded">
                   {category || "CATEGORY"}
                 </span>
-                <span className="text-foreground/30 text-xs font-mono">//</span>
-                <span className="text-[10px] font-mono text-foreground/50">{readTime}</span>
+                <span className="text-white/30 text-xs font-mono">//</span>
+                <span className="text-[10px] font-mono text-white/60">{readTime}</span>
               </div>
 
               {/* Title */}
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold leading-tight mb-4 text-foreground break-words">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold leading-tight mb-4 text-white break-words">
                 {title || "Untitled Archive Entry"}
               </h2>
 
               {/* Excerpt */}
               {excerpt && (
-                <p className="text-foreground/60 text-xs sm:text-sm leading-relaxed font-serif italic border-l border-foreground/30 pl-3 mb-6 break-words">
+                <p className="text-white/70 text-xs sm:text-sm leading-relaxed font-serif italic border-l-2 border-white/30 pl-3 mb-6 break-words">
                   {excerpt}
                 </p>
               )}
 
               {/* Metadata block mock */}
-              <div className="flex items-center justify-between border-t border-b border-foreground/5 py-3 mb-6 text-[9px] font-mono text-foreground/40 uppercase tracking-widest">
+              <div className="flex items-center justify-between border-t border-b border-white/10 py-3 mb-6 text-[9px] font-mono text-white/50 uppercase tracking-widest">
                 <span>By CHRONICLE WRITER</span>
                 <span>{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
               </div>
@@ -355,12 +440,12 @@ function WritePageContent() {
               {/* Body Content */}
               {content ? (
                 <div 
-                  className="serif-article-body text-foreground/80 text-xs sm:text-sm leading-relaxed prose prose-zinc dark:prose-invert max-w-none break-words
+                  className="serif-article-body text-white/90 text-xs sm:text-sm leading-relaxed prose prose-invert max-w-none break-words
                     [&>p]:mb-4 [&>p]:leading-relaxed
-                    [&>h3]:font-serif [&>h3]:text-base [&>h3]:font-bold [&>h3]:mt-6 [&>h3]:mb-3 [&>h3]:text-foreground
+                    [&>h3]:font-serif [&>h3]:text-base [&>h3]:font-bold [&>h3]:mt-6 [&>h3]:mb-3 [&>h3]:text-white
                     [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4
                     [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:mb-4
-                    [&>blockquote]:border-l-2 [&>blockquote]:border-foreground/20 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-foreground/60 [&>blockquote]:my-6 [&>blockquote]:font-serif"
+                    [&>blockquote]:border-l-2 [&>blockquote]:border-white/30 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-white/70 [&>blockquote]:my-6 [&>blockquote]:font-serif"
                   dangerouslySetInnerHTML={{ 
                     __html: content
                       .replace(/\n\n/g, "</p><p>")
@@ -369,20 +454,20 @@ function WritePageContent() {
                       .replace(/\*(.*?)\*/g, "<em>$1</em>")
                       .replace(/^- (.*)/gm, "<li>$1</li>")
                       .replace(/(<li>[\s\S]*<\/li>)/, "<ul>$1</ul>")
-                      .replace(/`([^`]+)`/g, "<code class='bg-foreground/5 px-1 py-0.5 rounded font-mono text-[11px]'>$1</code>")
+                      .replace(/`([^`]+)`/g, "<code class='bg-white/10 px-1 py-0.5 rounded font-mono text-[11px]'>$1</code>")
                   }}
                 />
               ) : (
-                <p className="font-mono text-xs text-foreground/30 italic text-center py-20">
+                <p className="font-mono text-xs text-white/40 italic text-center py-20">
                   Begin writing in the editor to populate the live preview...
                 </p>
               )}
 
               {/* Tags Mock */}
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-6 border-t border-foreground/5 pt-4">
+                <div className="flex flex-wrap gap-1 mt-6 border-t border-white/10 pt-4">
                   {tags.map(t => (
-                    <span key={t} className="text-[9px] font-mono text-foreground/50">
+                    <span key={t} className="text-[9px] font-mono text-white/55">
                       #{t}
                     </span>
                   ))}

@@ -18,6 +18,7 @@ export interface Post {
   likes: number;
   comments: Comment[];
   coverImage: string; // Tailwind gradient classes or styling hints
+  imageUrl?: string; // Base64 uploaded image URL
 }
 
 const DEFAULT_POSTS: Post[] = [

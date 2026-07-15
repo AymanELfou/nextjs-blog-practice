@@ -293,18 +293,21 @@ export default function Home() {
                 </div>
                 
                 {/* Visual Placeholder container */}
-                <div className="lg:col-span-5 w-full h-[320px] md:h-[400px] border border-foreground/10 rounded-2xl bg-gradient-to-br from-zinc-50 via-zinc-200 to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-black p-8 flex flex-col justify-between overflow-hidden relative group-hover:border-foreground/20 transition-all duration-500">
-                  <div className="absolute inset-0 bg-dot-matrix opacity-40"></div>
+                <div 
+                  className={`lg:col-span-5 w-full h-[320px] md:h-[400px] border border-foreground/15 rounded-2xl bg-gradient-to-br ${heroPost.coverImage || 'from-zinc-950 via-zinc-900 to-black'} p-8 flex flex-col justify-between overflow-hidden relative group-hover:border-foreground/20 transition-all duration-500 text-white`}
+                  style={heroPost.imageUrl ? { backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url(${heroPost.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+                >
+                  <div className="absolute inset-0 bg-dot-matrix opacity-20"></div>
                   <div className="relative flex justify-between items-start">
-                    <span className="font-mono text-xs uppercase tracking-widest bg-foreground text-background px-2.5 py-0.5 rounded-full font-medium">Featured</span>
-                    <BookOpen className="size-5 text-foreground/40" />
+                    <span className="font-mono text-xs uppercase tracking-widest bg-white text-black px-2.5 py-0.5 rounded-full font-semibold">Featured</span>
+                    <BookOpen className="size-5 text-white/40" />
                   </div>
-                  <div className="relative border-l-2 border-foreground/25 pl-4 py-1">
-                    <p className="font-serif italic text-lg text-foreground/80 leading-relaxed max-w-xs group-hover:translate-x-1 transition-transform duration-300">
+                  <div className="relative border-l-2 border-white/25 pl-4 py-1">
+                    <p className="font-serif italic text-lg text-white/80 leading-relaxed max-w-xs group-hover:translate-x-1 transition-transform duration-300">
                       "Design is not what it looks like. Design is how it works."
                     </p>
                   </div>
-                  <div className="relative font-mono text-[9px] uppercase tracking-widest text-foreground/30">
+                  <div className="relative font-mono text-[9px] uppercase tracking-widest text-white/30">
                     THE CHRONICLE ARCHIVE SYSTEM // 2026
                   </div>
                 </div>
@@ -320,18 +323,21 @@ export default function Home() {
                 >
                   <div className="flex flex-col">
                     {/* Visual box */}
-                    <div className="w-full h-44 rounded-xl border border-foreground/10 bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-black relative overflow-hidden mb-5 p-4 flex flex-col justify-between group-hover:border-foreground/15 transition-colors">
-                      <div className="absolute inset-0 bg-dot-matrix opacity-25"></div>
-                      <div className="relative flex justify-between items-center text-[10px] font-mono uppercase tracking-widest text-foreground/50">
+                    <div 
+                      className={`w-full h-44 rounded-xl border border-foreground/10 bg-gradient-to-br ${post.coverImage || 'from-zinc-950 via-zinc-900 to-black'} relative overflow-hidden mb-5 p-4 flex flex-col justify-between group-hover:border-foreground/15 transition-colors text-white`}
+                      style={post.imageUrl ? { backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.85)), url(${post.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+                    >
+                      <div className="absolute inset-0 bg-dot-matrix opacity-20"></div>
+                      <div className="relative flex justify-between items-center text-[10px] font-mono uppercase tracking-widest text-white/60">
                         <span>{post.category}</span>
                         <span>{post.readTime}</span>
                       </div>
-                      <div className="relative font-serif text-[11px] text-foreground/40 italic">
+                      <div className="relative font-serif text-[11px] text-white/70 italic">
                         {post.excerpt.slice(0, 48)}...
                       </div>
-                      <div className="relative flex justify-between items-end border-t border-foreground/5 pt-2">
-                        <span className="font-mono text-[9px] text-foreground/30">{post.date}</span>
-                        <ArrowUpRight className="size-4 text-foreground/30 group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                      <div className="relative flex justify-between items-end border-t border-white/5 pt-2">
+                        <span className="font-mono text-[9px] text-white/40">{post.date}</span>
+                        <ArrowUpRight className="size-4 text-white/40 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
                       </div>
                     </div>
 
@@ -433,7 +439,6 @@ export default function Home() {
       <footer className="w-full border-t border-foreground/10 py-8 bg-background/50 select-none">
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono tracking-widest text-foreground/40 uppercase">
           <div>
-            © 2026 THE CHRONICLE. ALL IMAGES SIMULATED.
           </div>
           <div className="flex gap-6">
             <span className="hover:text-foreground transition-colors cursor-help">Built with Next.js & Shadcn</span>
@@ -441,7 +446,7 @@ export default function Home() {
             <span className="hover:text-foreground transition-colors">Style: Monochromatic</span>
           </div>
           <div>
-            MADE BY ANTIGRAVITY
+
           </div>
         </div>
       </footer>

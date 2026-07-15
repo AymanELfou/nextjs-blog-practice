@@ -194,6 +194,18 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
             </div>
           </div>
 
+          {/* Visual Cover Banner */}
+          <div 
+            className={`w-full h-64 md:h-80 rounded-2xl bg-gradient-to-br ${post.coverImage || 'from-zinc-950 via-zinc-900 to-black'} overflow-hidden relative border border-foreground/10 mb-8 flex items-center justify-center text-white`}
+            style={post.imageUrl ? { backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.65)), url(${post.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+          >
+            {!post.imageUrl && (
+              <div className="text-center font-mono text-xs uppercase tracking-widest text-white/40">
+                THE CHRONICLE ARCHIVE // RECORD #{post.id}
+              </div>
+            )}
+          </div>
+
           {/* Heading */}
           <h1 className="font-serif text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight text-balance mb-6">
             {post.title}
