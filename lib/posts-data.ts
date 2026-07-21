@@ -174,6 +174,136 @@ Keep it simple. Build it solid. Make it a monolith until it absolutely has to br
       }
     ],
     coverImage: "from-zinc-950 via-zinc-950 to-black"
+  },
+  {
+    id: "4",
+    slug: "microservices-vs-monolith-event-driven",
+    title: "Microservices & Event-Driven Systems",
+    excerpt: "Deconstructing event-driven architectures: when to split your monolith and how to design resilient distributed systems.",
+    content: `Microservices promise independent deployments, decoupled teams, and infinite scalability. But behind the glossy architectural diagrams lies an undeniable truth: **distributed systems are hard**.
+
+When you move from a monolithic function call to an HTTP request or message queue, you introduce network partitions, latency, eventual consistency, and complex failure modes.
+
+### The Event-Driven Shift
+
+Rather than synchronous REST API calls connecting microservices, modern software engineering favors **event-driven communication**.
+
+Instead of Service A telling Service B to *do something*, Service A simply emits an event: \`OrderCreated\`. Any service interested in this event (Billing, Shipping, Notifications) listens asynchronously and reacts.
+
+### Core Principles of Resilient Architecture
+
+1. **Idempotency**: Every event handler must be idempotent. If an event is delivered twice (which *will* happen in distributed systems), the outcome must remain identical.
+2. **The Outbox Pattern**: Never write to your database and publish a message queue event in two separate un-transactional steps. Write the event to an \`outbox\` table in the same database transaction, then process it asynchronously.
+3. **Graceful Degradation**: If the recommendations service fails, the checkout flow must continue uninterrupted with sensible defaults.
+
+Architecture is not about avoiding complexity; it is about choosing which trade-offs you are willing to live with.`,
+    date: "July 15, 2026",
+    readTime: "7 min read",
+    category: "Software Engineering",
+    tags: ["microservices", "architecture", "system-design", "cloud"],
+    likes: 105,
+    comments: [
+      {
+        id: "c6",
+        name: "Sarah Chen",
+        content: "The outbox pattern saved our payment system from double-charge race conditions. Crucial read for any backend developer.",
+        date: "July 16, 2026"
+      }
+    ],
+    coverImage: "from-blue-950 via-indigo-950 to-zinc-950",
+    imageUrl: "/images/microservices.png"
+  },
+  {
+    id: "5",
+    slug: "clean-code-refactoring-patterns",
+    title: "Mastering Clean Code & Refactoring Patterns",
+    excerpt: "Practical patterns for writing maintainable TypeScript code, eliminating technical debt, and building long-lasting software systems.",
+    content: `Code is read far more often than it is written. Writing code that works is only the first step; writing code that remains readable, testable, and refactorable two years later is the mark of a senior engineer.
+
+### The Refactoring Mindset
+
+Refactoring is not a special phase that happens once a quarter—it is a continuous habit, like washing dishes as you cook.
+
+When you touch a piece of code to add a feature, leave it cleaner than you found it (the **Boy Scout Rule**).
+
+### Essential Patterns in TypeScript
+
+1. **Replace Primitive Obsession with Value Objects**: Avoid passing plain strings for email addresses, slugs, or IDs. Wrap them in types or validation schemas.
+2. **Prefer Composition Over Inheritance**: Deep class hierarchies lead to fragile base class problems. Compose small, focused utility functions and interfaces.
+3. **Guard Clauses Over Nested Conditionals**: If a function cannot proceed due to invalid state, exit immediately at the top of the function rather than nesting five \`if\` blocks.
+
+\`\`\`typescript
+// Bad: Nested Conditionals
+function processUser(user?: User) {
+  if (user) {
+    if (user.isActive) {
+      // process user
+    }
+  }
+}
+
+// Good: Guard Clause
+function processUser(user?: User) {
+  if (!user || !user.isActive) return;
+  // process user
+}
+\`\`\`
+
+Clean code is not about perfectionism; it is about reducing cognitive load for your future self and your teammates.`,
+    date: "July 18, 2026",
+    readTime: "5 min read",
+    category: "Software Engineering",
+    tags: ["clean-code", "refactoring", "typescript", "best-practices"],
+    likes: 74,
+    comments: [
+      {
+        id: "c7",
+        name: "David Miller",
+        content: "Guard clauses changed the way I write functions forever. So much easier to follow execution flow.",
+        date: "July 19, 2026"
+      }
+    ],
+    coverImage: "from-amber-950 via-red-950 to-zinc-950",
+    imageUrl: "/images/clean-code.png"
+  },
+  {
+    id: "6",
+    slug: "high-throughput-distributed-data-pipelines",
+    title: "Building High-Throughput Distributed Pipelines",
+    excerpt: "How high-scale software systems process millions of events per second with stream processing and distributed caches.",
+    content: `When your application scales from thousands of requests per day to millions of events per minute, standard relational database queries become the primary bottleneck.
+
+To handle massive volume without dropping requests, modern software engineering relies on **stream processing pipelines**.
+
+### The Architecture of High-Throughput Streams
+
+In a streaming pipeline, data flows through three distinct stages:
+
+1. **Ingestion (Kafka / Kinesis)**: Buffer incoming events into persistent partitions that allow multiple consumers to process at their own pace.
+2. **Stream Processing (Flink / Spark / Node Workers)**: Transform, filter, aggregate, and enrich events in real time as they flow through memory.
+3. **Serving Layer (Redis / Cassandra / ClickHouse)**: Write aggregated results into high-speed distributed caches or analytical databases optimized for read performance.
+
+### Caching Strategies That Scale
+
+- **Write-Through vs Read-Through**: Use write-through caching for mission-critical consistency, or read-through for read-heavy workloads.
+- **Cache Stampede Prevention**: Implement probabilistic early expiration or mutex locks to prevent thousands of simultaneous cache misses when a key expires.
+
+By decoupling data generation from data storage, you build systems that scale horizontally by simply adding more worker nodes.`,
+    date: "July 20, 2026",
+    readTime: "6 min read",
+    category: "Software Engineering",
+    tags: ["distributed-systems", "performance", "backend", "scalability"],
+    likes: 132,
+    comments: [
+      {
+        id: "c8",
+        name: "Alex Rivera",
+        content: "Fantastic high-level overview. Stream processing is becoming standard even for medium-scale SaaS apps.",
+        date: "July 21, 2026"
+      }
+    ],
+    coverImage: "from-emerald-950 via-teal-950 to-zinc-950",
+    imageUrl: "/images/distributed-systems.png"
   }
 ];
 
@@ -189,7 +319,19 @@ export function getPosts(): Post[] {
     return DEFAULT_POSTS;
   }
   try {
-    return JSON.parse(data);
+    const posts: Post[] = JSON.parse(data);
+    const existingSlugs = new Set(posts.map(p => p.slug));
+    let updated = false;
+    for (const defPost of DEFAULT_POSTS) {
+      if (!existingSlugs.has(defPost.slug)) {
+        posts.unshift(defPost);
+        updated = true;
+      }
+    }
+    if (updated) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+    }
+    return posts;
   } catch (e) {
     console.error("Error parsing posts from localStorage", e);
     return DEFAULT_POSTS;
